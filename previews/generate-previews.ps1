@@ -13,11 +13,15 @@ foreach($file in Get-ChildItem -LiteralPath $modelsDir -Filter '*.xmodel' -File 
   $compressed=$modelNode.GetAttribute('CustomModelCompressed')
   $dense=$modelNode.GetAttribute('CustomModel')
   if($compressed){
-    foreach($entry in $compressed.Split(';')){ $parts=$entry.Split(',');if($parts.Count -ge 3 -and $parts[0] -match '^\d+$' -and $parts[1] -match '^\d+$'){ $x=[int]$parts[0];$y=[int]$parts[1];$points.Add([pscustomobject]@{X=$x;Y=$y});if($x+1 -gt $width){$width=$x+1};if($y+1 -gt $height){$height=$y+1} } }
+    foreach($entry in $compressed.Split(';')){ $parts=$entry.Split(',');if($parts.Count -ge 3 -and $parts[0] -match '^\d+$' -and $parts[1] -match '^\d+$' -and $parts[2] -match '^\d+$'){ $x=[int]$parts[2];$y=[int]$parts[1];$points.Add([pscustomobject]@{X=$x;Y=$y});if($x+1 -gt $width){$width=$x+1};if($y+1 -gt $height){$height=$y+1} } }
     $wAttr=$modelNode.GetAttribute('CustomWidth');$hAttr=$modelNode.GetAttribute('CustomHeight');if($wAttr -match '^\d+$'){$width=[int]$wAttr};if($hAttr -match '^\d+$'){$height=[int]$hAttr}
   }elseif($dense){
     $rows=$dense.Split(';');$height=$rows.Count
     for($y=0;$y -lt $rows.Count;$y++){ $cells=$rows[$y].Split(',');if($cells.Count -gt $width){$width=$cells.Count};for($x=0;$x -lt $cells.Count;$x++){if($cells[$x] -match '^\d+$'){$points.Add([pscustomobject]@{X=$x;Y=$y})}} }
+  }
+  elseif($display -eq 'Matrix'){
+    $width=75;$height=32
+    for($y=0;$y -lt $height;$y++){for($x=0;$x -lt $width;$x++){$points.Add([pscustomobject]@{X=$x;Y=$y})}}
   }
   $safeLeaf=([IO.Path]::GetFileNameWithoutExtension($file.Name) -replace '[^A-Za-z0-9._-]+','-').Trim('-')
   $previewName=$safeLeaf+'.svg';$out=Join-Path $previewDir $previewName
@@ -34,16 +38,18 @@ foreach($file in Get-ChildItem -LiteralPath $modelsDir -Filter '*.xmodel' -File 
   $nodeLabel=if($points.Count){"$($points.Count) plotted nodes · ${width} × ${height}"}else{if($modelNode.GetAttribute('PixelCount')){"$($modelNode.GetAttribute('PixelCount')) nodes · preview map unavailable"}else{'preview map unavailable'}}
   $items += [pscustomobject]@{File=$file.Name;Model=$modelName;Preview=$previewName;Nodes=$nodeLabel;Display=$display}
 }
+$currentPreviewNames=@($items | ForEach-Object {$_.Preview})
+foreach($oldSvg in Get-ChildItem -LiteralPath $previewDir -Filter '*.svg' -File){if($currentPreviewNames -notcontains $oldSvg.Name){Remove-Item -LiteralPath $oldSvg.FullName -Force}}
 $md=[System.Text.StringBuilder]::new()
 [void]$md.AppendLine('# PricklyGuy xLights Models')
 [void]$md.AppendLine()
-[void]$md.AppendLine('A visual catalog of the xmodel files in models/. Filenames are preserved as supplied. The Model name in file column shows the name stored inside each xLights file; the name check flags any difference from the filename.')
+[void]$md.AppendLine('A visual catalog of the xmodel files in models/. Filenames are preserved. The embedded xLights name is listed beside each file. The name check ignores an optional leading PGC filename prefix and extra spaces after underscores.')
 [void]$md.AppendLine()
 [void]$md.AppendLine('Previews show the model node layout when the `.xmodel` contains a custom node map. Other previews identify the model type where no node map is embedded.')
 [void]$md.AppendLine()
 [void]$md.AppendLine('| Preview | File in repo | Model name in file | Name check | Preview detail |')
 [void]$md.AppendLine('|---|---|---|---|---|')
-foreach($item in $items){$fileUrl=[uri]::EscapeDataString($item.File);$previewUrl=[uri]::EscapeDataString($item.Preview);$check=if([IO.Path]::GetFileNameWithoutExtension($item.File) -eq $item.Model){"matches"}else{"⚠ differs"};[void]$md.AppendLine("| ![$($item.Model)](previews/$previewUrl) | [$($item.File)](models/$fileUrl) | $($item.Model) | $check | $($item.Nodes) |")}
+foreach($item in $items){$fileUrl=[uri]::EscapeDataString($item.File);$previewUrl=[uri]::EscapeDataString($item.Preview);$stem=([IO.Path]::GetFileNameWithoutExtension($item.File) -replace '_\s+','_').Trim();$normalModel=($item.Model -replace '_\s+','_').Trim();if($stem.StartsWith('PGC ') -and -not $normalModel.StartsWith('PGC ')){$stem=$stem.Substring(4)};$check=if($stem -eq $normalModel){"matches"}else{"⚠ differs"};[void]$md.AppendLine("| ![$($item.Model)](previews/$previewUrl) | [$($item.File)](models/$fileUrl) | $($item.Model) | $check | $($item.Nodes) |")}
 [void]$md.AppendLine()
 [void]$md.AppendLine('The original `.xmodel` files are in [`models/`](models/). Preview SVGs and the generator are in [`previews/`](previews/).')
 [IO.File]::WriteAllText((Join-Path $RepoPath 'README.md'),$md.ToString(),[Text.UTF8Encoding]::new($false))
