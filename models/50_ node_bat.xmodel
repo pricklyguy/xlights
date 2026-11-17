@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<models type="exported">
+	<model name="50_node_bat" DisplayAs="Custom" Antialias="1" Controller="Falcon_Roof" CustomBkgBrightness="20" CustomBkgImage="C:\Users\Owner\Desktop\2026_PGC_Bat.png" CustomBkgLightness="0" CustomBkgScale="100" CustomHeight="35" CustomWidth="74" Depth="1" Dir="L" heightmm="515" LayoutGroup="Default" ModelChain=">Bat 7" PixelCount="50" PixelSize="2" PixelType="12mm bullet" RotateX="0.000000" RotateY="-0.000000" RotateZ="14.703533" ScaleX="0.716989" ScaleY="0.562059" ScaleZ="0.716989" SourceVersion="2026.12" StartChannel="!Falcon_Roof:6595" StartSide="B" StrandNames="MyCustomModel" StringType="RGB Nodes" Transparency="0" versionNumber="8" widthmm="1390" WorldPosX="-53.689201" WorldPosY="150.678696" WorldPosZ="633.121887" CustomModelCompressed="40,3,17;11,3,54;39,5,13;12,5,58;41,6,17;10,6,54;38,8,9;42,8,18;13,8,62;9,9,53;43,11,19;8,11,52;37,12,6;14,12,65;44,13,21;49,13,32;7,13,50;2,14,39;35,15,8;34,15,11;45,15,24;50,15,35;1,15,37;6,15,47;16,15,63;36,16,4;46,16,26;48,16,33;4,16,41;5,16,44;17,16,60;15,16,67;33,17,14;47,17,30;3,17,38;18,17,57;20,19,50;32,20,16;31,20,20;30,20,22;19,20,54;21,21,47;29,22,25;22,24,45;28,25,26;27,25,30;23,25,41;26,27,33;24,27,38;25,30,36">
+		<ControllerConnection Port="4" Protocol="ws2811" SmartRemote="3" SRMaxCascade="1" SRCascadeOnPort="FALSE" SmartRemoteType="falcon_v2" />
+		<Aliases>
+			<alias name="oldname:8_bat" />
+		</Aliases>
+		<subModel name="Eyes" bufferstyle="Default" layout="horizontal" line0="1,50" type="ranges" />
+		<modelGroup name="All Bats" selected="0" models="All Bats - Flying,All Bats - Non Flying,Bat PGC Flying - 1,Bat PGC Flying - 2" LayoutGroup="Default" layout="minimalGrid" GridSize="400" centrex="0.000000" centrey="0.000000" centreDefined="0" />
+		<modelGroup name="All Bats - Non Flying" selected="0" models="Bat 1,Bat 2,Bat 3,Bat 4,Bat 5,Bat 6,Bat 7,Bat 8" LayoutGroup="Default" layout="minimalGrid" GridSize="400" centrex="0.000000" centrey="0.000000" centreDefined="0" />
+		<dimensions depth="54.015644" height="19.721733" units="i" width="54.015644" />
+	</model>
+</models>
